@@ -28,7 +28,10 @@ WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
 def main():
     forecast = get_rain_forecast("Cluj-Napoca,RO", "metric")
-    print_rain_forecast(forecast)
+    formatted_forecast = format_rain_forecast(forecast)
+
+    for forecast in formatted_forecast:
+        print(forecast)
 
 
 def get_rain_forecast(location, units="metric"):
@@ -89,21 +92,31 @@ def get_rain_forecast(location, units="metric"):
     return [hourly_forecast, units]
 
 
-def print_rain_forecast(hourly_forecast):
+def format_rain_forecast(forecast):
     """
-    Print the rain forecast for the day
+    Format the rain forecast for the day as a list of strings
 
     Args:
-        hourly_forecast (list): A list of dictionaries containing the hourly forecast data
+        forecast (list): A list containing the hourly forecast data
 
     Returns:
-        None
-    """
+        list: A list of formatted forecast strings"""
 
-    for forecast in hourly_forecast:
-        print(
-            f"{forecast['date_time']} | {forecast['temperature']} | {forecast['weather_description'].title()}"
+    unit_symbols = {
+        "metric": "°C",
+        "imperial": "°F",
+    }
+    hourly_forecast, units = forecast
+    unit = unit_symbols[units]
+
+    formatted_forecast = []
+
+    for f in hourly_forecast:
+        formatted_forecast.append(
+            f"{f['date_time']} | {f['temperature']}{unit} | {f['weather_description'].title()}"
         )
+
+    return formatted_forecast
 
 
 if __name__ == "__main__":
