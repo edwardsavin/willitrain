@@ -1,6 +1,6 @@
 import pytest
 import re
-from project import get_rain_forecast, format_rain_forecast, get_random_city
+from willitrain import get_rain_forecast, format_rain_forecast, get_random_city
 
 
 def test_invalid_units():
