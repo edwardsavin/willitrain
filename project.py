@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from colorama import init, Fore
 import sys
 import requests
 import datetime
@@ -27,11 +28,27 @@ WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
 
 def main():
+    """
+    Get the rain forecast for the day and print it to the console
+
+    It performs the following steps:
+        1. Get the rain forecast for the day
+        2. Format the rain forecast as a list of strings
+        3. Print the rain forecast to the console
+
+    Returns:
+        None
+    """
+
+    init(autoreset=True)
     forecast = get_rain_forecast("Cluj-Napoca,RO", "metric")
     formatted_forecast = format_rain_forecast(forecast)
 
     for forecast in formatted_forecast:
-        print(forecast)
+        if "rain" in forecast.lower():
+            print(Fore.BLUE + forecast)
+        else:
+            print(forecast)
 
 
 def get_rain_forecast(location, units="metric"):
