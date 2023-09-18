@@ -1,6 +1,6 @@
 import pytest
 import re
-from project import get_rain_forecast, format_rain_forecast
+from project import get_rain_forecast, format_rain_forecast, get_random_city
 
 
 def test_invalid_units():
@@ -30,10 +30,25 @@ def test_random_units():
     assert re.search(units_regex, formatted_forecast[0]) is not None
 
 
-def test_valid_rain_forecast():
+def test_get_rain_forecast():
     forecast = get_rain_forecast("London", "metric")
 
     assert isinstance(forecast, list)
     assert isinstance(forecast[0][0], dict)
     assert "temperature" in forecast[0][0]
     assert "weather_description" in forecast[0][0]
+
+
+def test_format_rain_forecast():
+    forecast = get_rain_forecast("London", "metric")
+    formatted_forecast = format_rain_forecast(forecast)
+
+    assert isinstance(formatted_forecast, list)
+    assert isinstance(formatted_forecast[0], str)
+    assert "|" in formatted_forecast[0]
+
+
+def test_get_random_city():
+    city = get_random_city()
+
+    assert isinstance(city, str)

@@ -63,10 +63,49 @@ def main():
         None
     """
 
+    init(autoreset=True)
+
+    args = set_command_line_arguments().parse_args()
+    if args.random_location:
+        args.location = get_random_city()
+
+    forecast = get_rain_forecast(args.location, args.units)
+    formatted_forecast = format_rain_forecast(forecast)
+
+    print(f"Forecast for {args.location}:")
+    for forecast in formatted_forecast:
+        if "rain" in forecast.lower():
+            print(Fore.BLUE + forecast)
+        else:
+            print(forecast)
+
+
+def get_user_city():
+    """
+    Get the user's city based on their IP address
+
+    Returns:
+        str: The user's city
+    """
+
     try:
-        user_city = geocoder.ip("me").city
+        return geocoder.ip("me").city
     except (Exception,):
-        user_city = "Cluj-Napoca"
+        return "Cluj-Napoca"
+
+
+def set_command_line_arguments():
+    """
+    Set the command line arguments
+
+    It sets the following arguments:
+        location (str): The location to get the forecast for
+        units (str): The units to use for the forecast (metric or imperial)
+        random_location (bool): Run Will It Rain on a random location
+
+    Returns:
+        argparse.ArgumentParser: The command line arguments
+    """
 
     arg_parser = argparse.ArgumentParser(
         prog="Will It Rain",
@@ -78,7 +117,7 @@ def main():
         nargs="?",
         type=str,
         help="The location to get the forecast for",
-        default=user_city,
+        default=get_user_city(),
     )
     arg_parser.add_argument(
         "-u",
@@ -94,21 +133,8 @@ def main():
         action="store_true",
         help="Run Will It Rain on a random location",
     )
-    args = arg_parser.parse_args()
 
-    if args.random_location:
-        args.location = get_random_city()
-
-    init(autoreset=True)
-    forecast = get_rain_forecast(args.location, args.units)
-    formatted_forecast = format_rain_forecast(forecast)
-
-    print(f"Forecast for {args.location}:")
-    for forecast in formatted_forecast:
-        if "rain" in forecast.lower():
-            print(Fore.BLUE + forecast)
-        else:
-            print(forecast)
+    return arg_parser
 
 
 def get_rain_forecast(location, units="metric"):
