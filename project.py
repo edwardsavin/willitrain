@@ -2,6 +2,7 @@ from configparser import ConfigParser
 import sys
 import requests
 import datetime
+import random
 
 
 def _get_api_key():
@@ -22,7 +23,7 @@ def _get_api_key():
 
 
 API_KEY = _get_api_key()
-WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/forecast"
+WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
 
 def main():
@@ -41,6 +42,12 @@ def get_rain_forecast(location, units="metric"):
     Returns:
         list: A list of dictionaries containing the hourly forecast data
     """
+
+    if units not in ["metric", "imperial", "random"]:
+        sys.exit("Invalid units. Please use either metric or imperial.")
+
+    if units == "random":
+        units = random.choice(["metric", "imperial"])
 
     request_url = f"{WEATHER_API_URL}?q={location}&units={units}&APPID={API_KEY}"
 
@@ -74,12 +81,12 @@ def get_rain_forecast(location, units="metric"):
                     "date_time": datetime.datetime.utcfromtimestamp(
                         forecast["dt"]
                     ).strftime("%H:%M"),
-                    "temperature": f"{int(round(forecast['main']['temp']))}°C",
+                    "temperature": int(round(forecast["main"]["temp"])),
                     "weather_description": forecast["weather"][0]["description"],
                 }
             )
 
-    return hourly_forecast
+    return [hourly_forecast, units]
 
 
 def print_rain_forecast(hourly_forecast):
