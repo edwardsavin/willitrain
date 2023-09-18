@@ -66,6 +66,7 @@ def main():
     init(autoreset=True)
 
     args = set_command_line_arguments().parse_args()
+    args.location = " ".join(args.location)
     if args.random_location:
         args.location = get_random_city()
 
@@ -114,15 +115,15 @@ def set_command_line_arguments():
     )
     arg_parser.add_argument(
         "location",
-        nargs="?",
-        type=str,
+        nargs="*",
+        type=str.title,
         help="The location to get the forecast for",
         default=get_user_city(),
     )
     arg_parser.add_argument(
         "-u",
         "--units",
-        type=str,
+        type=str.lower,
         choices=["metric", "imperial", "random"],
         help="The units to use for the forecast",
         default="metric",
