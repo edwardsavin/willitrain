@@ -4,6 +4,7 @@ import sys
 import requests
 import datetime
 import random
+import argparse
 
 
 def _get_api_key():
@@ -40,10 +41,32 @@ def main():
         None
     """
 
+    arg_parser = argparse.ArgumentParser(
+        prog="Will It Rain",
+        description="Get the rain forecast for the day",
+        epilog="Enjoy the rain! (...or not)",
+    )
+    arg_parser.add_argument(
+        "location",
+        nargs="?",
+        type=str,
+        help="The location to get the forecast for",
+        default="Cluj-Napoca",  # TODO: implement getting location from IP
+    )
+    arg_parser.add_argument(
+        "-u",
+        "--units",
+        type=str,
+        help="The units to use for the forecast (metric or imperial)",
+        default="metric",
+    )
+    args = arg_parser.parse_args()
+
     init(autoreset=True)
-    forecast = get_rain_forecast("Cluj-Napoca,RO", "metric")
+    forecast = get_rain_forecast(args.location, args.units)
     formatted_forecast = format_rain_forecast(forecast)
 
+    print(f"Forecast for {args.location}:")
     for forecast in formatted_forecast:
         if "rain" in forecast.lower():
             print(Fore.BLUE + forecast)
