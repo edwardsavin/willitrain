@@ -26,7 +26,7 @@ WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/forecast"
 
 
 def main():
-    forecast = get_rain_forecast("London", "metric")
+    forecast = get_rain_forecast("Cluj-Napoca,RO", "metric")
     print_rain_forecast(forecast)
 
 
@@ -43,7 +43,21 @@ def get_rain_forecast(location, units="metric"):
     """
 
     request_url = f"{WEATHER_API_URL}?q={location}&units={units}&APPID={API_KEY}"
-    response = requests.get(request_url)
+
+    try:
+        response = requests.get(request_url)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 401:
+            sys.exit("Access denied. Please check your API key.")
+        elif e.response.status_code == 404:
+            sys.exit(
+                "Sorry but I couldn't find that location. To make the search more precise, please put the city's name, "
+                "comma, 2-letter country code (ISO3166)."
+            )
+        else:
+            sys.exit(f"Sorry but something went wrong: {e.response.status_code}")
+
     data = response.json()
 
     hourly_forecast = []
