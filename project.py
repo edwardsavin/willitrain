@@ -1,10 +1,12 @@
-from configparser import ConfigParser
-from colorama import init, Fore
-import sys
-import requests
+import argparse
 import datetime
 import random
-import argparse
+import sys
+from configparser import ConfigParser
+
+import geocoder
+import requests
+from colorama import init, Fore
 
 
 def _get_api_key():
@@ -33,31 +35,39 @@ def main():
     Get the rain forecast for the day and print it to the console
 
     It performs the following steps:
-        1. Get the rain forecast for the day
-        2. Format the rain forecast as a list of strings
-        3. Print the rain forecast to the console
+        1. Get the user's city based on their IP address
+        2. Parse the command line arguments
+        3. Get the rain forecast for the day
+        4. Format the rain forecast for the day
+        5. Print the rain forecast to the console
 
     Returns:
         None
     """
 
+    try:
+        user_city = geocoder.ip("me").city
+    except (Exception,):
+        user_city = "Cluj-Napoca"
+
     arg_parser = argparse.ArgumentParser(
         prog="Will It Rain",
         description="Get the rain forecast for the day",
-        epilog="Enjoy the rain! (...or not)",
+        epilog=f"{Fore.BLUE}Enjoy the rain! (...or not)",
     )
     arg_parser.add_argument(
         "location",
         nargs="?",
         type=str,
         help="The location to get the forecast for",
-        default="Cluj-Napoca",  # TODO: implement getting location from IP
+        default=user_city,
     )
     arg_parser.add_argument(
         "-u",
         "--units",
         type=str,
-        help="The units to use for the forecast (metric or imperial)",
+        choices=["metric", "imperial", "random"],
+        help="The units to use for the forecast",
         default="metric",
     )
     args = arg_parser.parse_args()

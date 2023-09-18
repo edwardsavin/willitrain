@@ -3,3 +3,5 @@ pytest~=7.4.2
 requests~=2.25.1
 
 colorama~=0.4.4
+
+geocoder~=1.38.1
