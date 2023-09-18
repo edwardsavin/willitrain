@@ -26,7 +26,25 @@ def _get_api_key():
     return config["openweather"]["api_key"]
 
 
+def _get_geonames_username():
+    """
+    Get the Geonames username from the config file
+
+    Expects a "secrets.ini" file in the same directory as this file with the following format:
+        [geonames]
+        username=<GEONAMES_USERNAME>
+
+    Returns:
+        str: The Geonames username
+    """
+
+    config = ConfigParser()
+    config.read("secrets.ini")
+    return config["geonames"]["username"]
+
+
 API_KEY = _get_api_key()
+GEONAMES_USERNAME = _get_geonames_username()
 WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
 
@@ -70,7 +88,16 @@ def main():
         help="The units to use for the forecast",
         default="metric",
     )
+    arg_parser.add_argument(
+        "-rl",
+        "--random-location",
+        action="store_true",
+        help="Run Will It Rain on a random location",
+    )
     args = arg_parser.parse_args()
+
+    if args.random_location:
+        args.location = get_random_city()
 
     init(autoreset=True)
     forecast = get_rain_forecast(args.location, args.units)
@@ -167,6 +194,30 @@ def format_rain_forecast(forecast):
         )
 
     return formatted_forecast
+
+
+def get_random_city():
+    """
+    Get a random city from the Geonames API
+
+    Returns:
+        str: A random city name
+    """
+
+    url = f"http://api.geonames.org/searchJSON?formatted=true&username={GEONAMES_USERNAME}&featureClass=P&maxRows=1000"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        sys.exit(
+            f"Sorry but something went wrong with the Geonames API: {e.response.status_code}"
+        )
+
+    data = response.json()
+    cities = data["geonames"]
+    random_city = random.choice(cities)
+    return random_city["name"]
 
 
 if __name__ == "__main__":
