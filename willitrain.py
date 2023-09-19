@@ -66,7 +66,10 @@ def main():
     init(autoreset=True)
 
     args = set_command_line_arguments().parse_args()
-    args.location = " ".join(args.location)
+
+    if isinstance(args.location, list):
+        args.location = " ".join(args.location)
+
     if args.random_location:
         args.location = get_random_city()
 
